@@ -9,7 +9,7 @@ Sample Bitbucket Pipeline for SFDX, adapted from https://github.com/forcedotcom/
 
 
 
-The steps bellow describe how to set up a pipeline for the following developement and release management process:
+The steps bellow describe how to set up a pipeline for this developement and release management process:
 
 ![overview](https://github.com/mehdisfdc/sfdx-BitbucketPipeline/blob/master/img/overview.png "Overview")
 

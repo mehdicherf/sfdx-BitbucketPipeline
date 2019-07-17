@@ -1,0 +1,116 @@
+image: mehdisfdc/sfdx-cli #image with sfdx installed
+
+
+#===DEFINITIONS===
+definitions:
+ 
+scripts:
+ script: &loginPROD openssl enc -nosalt -aes-256-cbc -d -in build/PROD_server.key.enc -out build/server.key -base64 -K $PROD_AESKEY -iv $PROD_IVKEY && sfdx force:auth:jwt:grant -s --clientid $PROD_CONSUMERKEY --jwtkeyfile build/server.key --username $PROD_USERNAME --instanceurl https://login.salesforce.com
+ script: &loginCI openssl enc -nosalt -aes-256-cbc -d -in build/ci_server.key.enc -out build/server.key -base64 -K $CI_AESKEY -iv $CI_IVKEY && sfdx force:auth:jwt:grant -s --clientid $CI_CONSUMERKEY --jwtkeyfile build/server.key --username $CI_USERNAME
+ script: &loginINTEG openssl enc -nosalt -aes-256-cbc -d -in build/integ_server.key.enc -out build/server.key -base64 -K $INTEG_AESKEY -iv $INTEG_IVKEY && sfdx force:auth:jwt:grant -s --clientid $INTEG_CONSUMERKEY --jwtkeyfile build/server.key --username $INTEG_USERNAME
+ script: &loginUAT openssl enc -nosalt -aes-256-cbc -d -in build/uat_server.key.enc -out build/server.key -base64 -K $UAT_AESKEY -iv $UAT_IVKEY && sfdx force:auth:jwt:grant -s --clientid $UAT_CONSUMERKEY --jwtkeyfile build/server.key --username $UAT_USERNAME
+ script: &assignEnvVar export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true && export SFDX_DOMAIN_RETRY=300 && export SFDX_DISABLE_APP_HUB=true && export SFDX_LOG_LEVEL=DEBUG
+ script: &removeScratchOnlyFolders rm -rf force-app/main/default/namedCredentials/
+ script: &convertSource sfdx force:source:convert -d src
+ script: &mdapiDeploy sfdx force:mdapi:deploy -d src -w 15
+ script: &mdapiDeployAndTest sfdx force:mdapi:deploy -d src -l RunLocalTests -w 15
+ script: &mdapiDeployCheckOnly sfdx force:mdapi:deploy -c -d src -l RunLocalTests -w 15
+
+ 
+ steps:
+  
+    - step: &pmd-check
+        name: Code Quality - PMD
+        script:
+          #===Download PMD===
+          - wget https://github.com/pmd/pmd/releases/download/pmd_releases%2F6.16.0/pmd-bin-6.16.0.zip
+          - unzip pmd-bin-6.16.0.zip
+          #===Make sure there is no PMD error with a high priority===
+          - pmd-bin-6.16.0/bin/run.sh pmd -minimumpriority $PMD_MINIMUM_PRIORITY -d force-app -R custom-apex-rules.xml -f text -l apex
+
+    - step: &scratch-check
+        name: Scratch org Push & Test
+        script:
+          #===assign variables===
+          - *assignEnvVar
+          #===login to Dev Hub===
+          - *loginPROD
+          #===setup scratch org===
+          - sfdx force:org:create -v $PROD_USERNAME --setdefaultusername --definitionfile config/project-scratch-def.json --setalias ciorg --wait 10 --durationdays 1
+          - sfdx force:org:display -u ciorg
+          - sfdx force:source:push -u ciorg --json
+          #===get test results===
+          - sfdx force:apex:test:run -u ciorg --wait 10
+          #===delete scratch org===
+          - sfdx force:org:delete -u ciorg -p
+
+    - step: &ci-validate
+        name: CI sandbox Check-only 
+        script:
+            #===assign variables===
+            - *assignEnvVar
+            #===create deployment package===
+            - *removeScratchOnlyFolders
+            - *convertSource
+            #===auth with target===
+            - *loginCI
+            #===deploy===
+            - *mdapiDeployCheckOnly
+
+    - step: &integ-deploy
+        name: Deploy to INTEG org
+        script:
+            #===assign variables===
+            - *assignEnvVar
+            #===create deployment package===
+            - *removeScratchOnlyFolders
+            - *convertSource
+            #===auth with target===
+            - *loginINTEG
+            #===deploy===
+            - *mdapiDeploy
+
+    - step: &uat-deploy
+        name: Deploy to UAT org
+        script:
+            #===assign variables===
+            - *assignEnvVar
+            #===create deployment package===
+            - *removeScratchOnlyFolders
+            - *convertSource
+            #===auth with target===
+            - *loginUAT
+            #===deploy===
+            - *mdapiDeployAndTest
+
+    - step: &prod-deploy
+        name: Deploy to PROD org
+        script:
+            #===assign variables===
+            - *assignEnvVar
+            #===create deployment package===
+            - *removeScratchOnlyFolders
+            - *convertSource
+            #===auth with target===
+            - *loginPROD
+            #===deploy===
+            - *mdapiDeploy
+
+
+
+#===PIPELINES===
+pipelines:
+
+  default: #this will run for all branches unless specificed otherwise
+    - parallel:
+        - step: *pmd-check
+        - step: *scratch-check
+        - step: *ci-validate
+
+  branches:
+    develop:
+      - step: *integ-deploy
+    release/*:
+      - step: *uat-deploy
+    master:
+      - step: *prod-deploy

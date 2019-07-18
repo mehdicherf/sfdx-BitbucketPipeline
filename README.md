@@ -13,7 +13,7 @@ The steps bellow describe how to set up a pipeline for this developement and rel
 
 ![overview](https://github.com/mehdisfdc/sfdx-BitbucketPipeline/blob/master/img/overview.png "Overview")
 
-## Step 1 - Create connected app to authenticate with JWT-Based Flow:
+## Step 1 - Create connected app and certificate to authenticate with JWT-Based Flow:
 * On your local machine, make sure you have the Salesforce CLI installed. Check by running `sfdx force --help` and confirm you see the command output. If you don't have it installed you can download and install it from https://developer.salesforce.com/tools/sfdxcli
 
 * Create a Private Key and Self-Signed Digital Certificate for *each* org to authorize: https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_key_and_cert.htm
@@ -26,7 +26,7 @@ The steps bellow describe how to set up a pipeline for this developement and rel
 
 * (Optionnal) Confirm you can perform a JWT-based auth: `sfdx force:auth:jwt:grant --clientid <your_consumer_key> --jwtkeyfile server.key --username <your_username> --setdefaultdevhubusername`
 
-## Step 2 - Create and encrypt the certificate to authenticate with the connected app:
+## Step 2 - Encrypt the certificate to authenticate with the connected app:
 * Then we will encrypt and store the generated `server.key` in encrypted form. First, generate a key and initialization vector (iv) to encrypt your server.key file locally. The key and iv are used by Bitbucket Pipeplines to decrypt your server key in the build environment. Use a random and long passphrase generated with your password manager:
 `openssl enc -aes-256-cbc -k <passphrase here> -P -md sha256 -nosalt`
 * Make note of the `key` and `iv` values output to the screen. You'll use the values following `key=` and `iv =` to encrypt your `server.key`.

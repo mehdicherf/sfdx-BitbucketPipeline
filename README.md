@@ -26,7 +26,7 @@ The steps bellow describe how to set up a pipeline for this developement and rel
 
 * (Optionnal) Confirm you can perform a JWT-based auth: `sfdx force:auth:jwt:grant --clientid <your_consumer_key> --jwtkeyfile server.key --username <your_username> --setdefaultdevhubusername`
 
-## Step 2 - Encrypt the certificate to authenticate with the connected app:
+## Step 2 - Encrypt the certificate before saving it to your repo:
 * Then we will encrypt and store the generated `server.key` in encrypted form. First, generate a key and initialization vector (iv) to encrypt your server.key file locally. The key and iv are used by Bitbucket Pipeplines to decrypt your server key in the build environment. Use a random and long passphrase generated with your password manager:
 `openssl enc -aes-256-cbc -k <passphrase here> -P -md sha256 -nosalt`
 * Make note of the `key` and `iv` values output to the screen. You'll use the values following `key=` and `iv =` to encrypt your `server.key`.

@@ -1,7 +1,7 @@
 # sfdx-BitbucketPipeline
 
 
-Sample Bitbucket Pipeline for SFDX, adapted from https://github.com/forcedotcom/sfdx-bitbucket-org, so that it accepts source in DX format, and automate the following tasks:
+Sample Bitbucket Pipeline for SFDX, adapted from https://github.com/forcedotcom/sfdx-bitbucket-org and https://github.com/forcedotcom/sfdx-bitbucket-package, so that it automates the following tasks:
 * By default on each commit, control the code quality with Apex PMD and make sure that the repo can deploy properly (checked in a new scratch org and in a dedicated CI sandbox)
 * When merging into the `develop` branch, deploy to the INTEG sandbox
 * When merging into a `release/` branch, deploy to the UAT sandbox

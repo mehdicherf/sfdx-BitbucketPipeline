@@ -2,7 +2,10 @@
 
 
 Sample Bitbucket Pipeline for SFDX, adapted from https://github.com/forcedotcom/sfdx-bitbucket-org and https://github.com/forcedotcom/sfdx-bitbucket-package, so that it can be used for CI tasks when using the [Git FLow](https://nvie.com/posts/a-successful-git-branching-model/) branching model on a Salesforce implementation project:
-* By default on each commit, control the code quality with Apex PMD and make sure that the repo can deploy properly (checked in a new scratch org and in a dedicated CI sandbox)
+* By default on each commit:
+   * Control the code quality with Apex PMD
+   * Deploy and run tests in a new scratch org
+   * Check-only deploy and run tests in the CI sandbox
 * When merging into the `develop` branch, deploy to the INTEG sandbox
 * When merging into a `release/` branch, deploy to the UAT sandbox
 * When merging into the `master` branch, deploy to PROD

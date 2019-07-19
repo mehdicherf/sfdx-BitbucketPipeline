@@ -1,7 +1,7 @@
 # sfdx-BitbucketPipeline
 
 
-Sample Bitbucket Pipeline for SFDX, adapted from https://github.com/forcedotcom/sfdx-bitbucket-org and https://github.com/forcedotcom/sfdx-bitbucket-package, so that it can be used for CI tasks when using the [Git FLow](https://nvie.com/posts/a-successful-git-branching-model/) branching model on a Salesforce implementation project:
+Sample Bitbucket Pipeline for SFDX, adapted from https://github.com/forcedotcom/sfdx-bitbucket-org and https://github.com/forcedotcom/sfdx-bitbucket-package, so that it can be used for CI tasks when using the [Git FLow](https://nvie.com/posts/a-successful-git-branching-model/) branching model on a Salesforce implementation project with DX sources:
 * By default on each commit:
    * Control the code quality with Apex PMD
    * Deploy and run tests in a new scratch org

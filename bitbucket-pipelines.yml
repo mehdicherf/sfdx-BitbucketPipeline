@@ -5,16 +5,16 @@ image: mehdisfdc/sfdx-cli #image with sfdx installed
 definitions:
  
 scripts:
- script: &loginPROD openssl enc -nosalt -aes-256-cbc -d -in build/PROD_server.key.enc -out build/server.key -base64 -K $PROD_AESKEY -iv $PROD_IVKEY && sfdx force:auth:jwt:grant -s --clientid $PROD_CONSUMERKEY --jwtkeyfile build/server.key --username $PROD_USERNAME --instanceurl https://login.salesforce.com
- script: &loginCI openssl enc -nosalt -aes-256-cbc -d -in build/ci_server.key.enc -out build/server.key -base64 -K $CI_AESKEY -iv $CI_IVKEY && sfdx force:auth:jwt:grant -s --clientid $CI_CONSUMERKEY --jwtkeyfile build/server.key --username $CI_USERNAME
- script: &loginINTEG openssl enc -nosalt -aes-256-cbc -d -in build/integ_server.key.enc -out build/server.key -base64 -K $INTEG_AESKEY -iv $INTEG_IVKEY && sfdx force:auth:jwt:grant -s --clientid $INTEG_CONSUMERKEY --jwtkeyfile build/server.key --username $INTEG_USERNAME
- script: &loginUAT openssl enc -nosalt -aes-256-cbc -d -in build/uat_server.key.enc -out build/server.key -base64 -K $UAT_AESKEY -iv $UAT_IVKEY && sfdx force:auth:jwt:grant -s --clientid $UAT_CONSUMERKEY --jwtkeyfile build/server.key --username $UAT_USERNAME
- script: &assignEnvVar export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true && export SFDX_DOMAIN_RETRY=300 && export SFDX_DISABLE_APP_HUB=true && export SFDX_LOG_LEVEL=DEBUG
- script: &removeScratchOnlyFolders rm -rf force-app/main/default/namedCredentials/
- script: &convertSource sfdx force:source:convert -d src
- script: &mdapiDeploy sfdx force:mdapi:deploy -d src -w 15
- script: &mdapiDeployAndTest sfdx force:mdapi:deploy -d src -l RunLocalTests -w 15
- script: &mdapiDeployCheckOnly sfdx force:mdapi:deploy -c -d src -l RunLocalTests -w 15
+ loginPROD: &loginPROD openssl enc -nosalt -aes-256-cbc -d -in build/PROD_server.key.enc -out build/server.key -base64 -K $PROD_AESKEY -iv $PROD_IVKEY && sfdx force:auth:jwt:grant -s --clientid $PROD_CONSUMERKEY --jwtkeyfile build/server.key --username $PROD_USERNAME --instanceurl https://login.salesforce.com
+ loginCI: &loginCI openssl enc -nosalt -aes-256-cbc -d -in build/ci_server.key.enc -out build/server.key -base64 -K $CI_AESKEY -iv $CI_IVKEY && sfdx force:auth:jwt:grant -s --clientid $CI_CONSUMERKEY --jwtkeyfile build/server.key --username $CI_USERNAME
+ loginINTEG: &loginINTEG openssl enc -nosalt -aes-256-cbc -d -in build/integ_server.key.enc -out build/server.key -base64 -K $INTEG_AESKEY -iv $INTEG_IVKEY && sfdx force:auth:jwt:grant -s --clientid $INTEG_CONSUMERKEY --jwtkeyfile build/server.key --username $INTEG_USERNAME
+ loginUAT: &loginUAT openssl enc -nosalt -aes-256-cbc -d -in build/uat_server.key.enc -out build/server.key -base64 -K $UAT_AESKEY -iv $UAT_IVKEY && sfdx force:auth:jwt:grant -s --clientid $UAT_CONSUMERKEY --jwtkeyfile build/server.key --username $UAT_USERNAME
+ assignEnvVar: &assignEnvVar export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true && export SFDX_DOMAIN_RETRY=300 && export SFDX_DISABLE_APP_HUB=true && export SFDX_LOG_LEVEL=DEBUG
+ removeScratchOnlyFolders: &removeScratchOnlyFolders rm -rf force-app/main/default/namedCredentials/
+ convertSource: &convertSource sfdx force:source:convert -d src
+ mdapiDeploy: &mdapiDeploy sfdx force:mdapi:deploy -d src -w 15
+ mdapiDeployAndTest: &mdapiDeployAndTest sfdx force:mdapi:deploy -d src -l RunLocalTests -w 15
+ mdapiDeployCheckOnly: &mdapiDeployCheckOnly sfdx force:mdapi:deploy -c -d src -l RunLocalTests -w 15
 
  
  steps:

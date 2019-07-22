@@ -33,7 +33,7 @@ $ chmod u+x bootstrap-jwt-auth-prerequisites.sh
 
 * From this JWT-based connected app on Salesforce, retrieve the generated `Consumer Key` from your org.
 
-* Set your Consumer Key in a Bitbucket Pipelines protected environment variable named `PROD_CONSUMERKEY` using the Bitbucket Pipelines UI (under `Settings > Repository variables`). Set your Username in a Bitbucket Pipelines environment variable named `PROD_USERNAME` using the Bitbucket Pipelines UI. 
+* Set your Consumer Key in a Bitbucket Pipelines **protected** environment variable named `PROD_CONSUMERKEY` using the Bitbucket Pipelines UI (under `Settings > Repository variables`). Set your Username in a Bitbucket Pipelines environment variable named `PROD_USERNAME` using the Bitbucket Pipelines UI. 
 
 ## Step 2 - Create the certificate and the encrypted private key:
 * To generate the certificate and the encrypted private key, execute the script :
@@ -41,7 +41,7 @@ $ chmod u+x bootstrap-jwt-auth-prerequisites.sh
 $ ./bootstrap-jwt-auth-prerequisites.sh <password> <env>
 ```
 
-* Set your PROD password in a protected Bitbucket Pipelines environment variable named `PROD_KEY_PASSWORD` using the Bitbucket Pipelines UI (under `Settings > Repository variables`).
+* Set your PROD password in a **protected** Bitbucket Pipelines environment variable named `PROD_KEY_PASSWORD` using the Bitbucket Pipelines UI (under `Settings > Repository variables`).
 
 * Upload the certificate from `./certificate/<env>.crt`. Follow step 7 and 8 from the documentatiion (https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_connected_app.htm)
 

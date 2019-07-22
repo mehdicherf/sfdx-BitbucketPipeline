@@ -22,7 +22,7 @@ PASSWORD="$1"
 
 ENV="$2"
 if [ -z "$2" ] ; then
-    ENV="server"
+    ENV="env"
 fi
 
 #### CREATE LOCAL VARIABLES ########################################################################
@@ -51,11 +51,12 @@ openssl x509 -req -sha256 -days $CERTIFICATE_EXPIRE_DAYS -in server.csr -signkey
 
 
 mkdir ../build 2>/dev/null
-mkdir ../certificates 2>/dev/null
+mkdir ../certificate 2>/dev/null
 
-openssl aes-256-cbc -salt -e -in server.key -out "$ENV_server.key.enc" -k $PASSWORD 2>/dev/null
-mv "$ENV_server.key.enc" ../build
-mv "$ENV.crt"../certificates
+openssl aes-256-cbc -salt -e -in server.key -out "${ENV}_server.key.enc" -k $PASSWORD 2>/dev/null
+mv "${ENV}_server.key.enc" ../build
+mv "$ENV.crt" ../certificate
 cd ..
 rm -rf tmp
-echo "$ENV.crt & $ENV_server.key.enc created in the build folder"
+echo "$ENV.crt in the build folder"
+echo "${ENV}_server.key.enc created in the certificate folder"

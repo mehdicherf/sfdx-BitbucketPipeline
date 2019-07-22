@@ -22,6 +22,11 @@ The steps bellow describe how to set up a pipeline for this developement and rel
 
 * If you want to test on your local machine, make sure you have the ability to execute shell script.
 
+* Give the right to execute the bootstrap script
+```
+$ chmod u+x bootstrap-jwt-auth-prerequisites.sh
+```
+
 ## Step 1 - Create connected app to authenticate with JWT-Based Flow:
 
 * Create a connected app to use the JWT-Based Flow to login (https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_connected_app.htm) (except step 7 and 8, we'll do that later). For more info on setting up JWT-based auth, see also the Salesforce DX Developer Guide (https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev)
@@ -38,7 +43,7 @@ $ ./bootstrap-jwt-auth-prerequisites.sh <password> <env>
 
 * Set your PROD password in a protected Bitbucket Pipelines environment variable named `PROD_KEY_PASSWORD` using the Bitbucket Pipelines UI (under `Settings > Repository variables`).
 
-* Upload the certificate from `./certificates/<env>.crt`. Follow step 7 and 8 from the documentatiion (https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_connected_app.htm)
+* Upload the certificate from `./certificate/<env>.crt`. Follow step 7 and 8 from the documentatiion (https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_connected_app.htm)
 
 * Clear the terminal history: `history -c`
 

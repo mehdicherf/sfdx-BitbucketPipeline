@@ -5,10 +5,8 @@ image: mehdisfdc/sfdx-cli #image with sfdx installed
 definitions:
  
 scripts:
- loginPROD: &loginPROD openssl enc -nosalt -aes-256-cbc -d -in build/PROD_server.key.enc -out build/server.key -base64 -K $PROD_AESKEY -iv $PROD_IVKEY && sfdx force:auth:jwt:grant -s --clientid $PROD_CONSUMERKEY --jwtkeyfile build/server.key --username $PROD_USERNAME --instanceurl https://login.salesforce.com
- loginCI: &loginCI openssl enc -nosalt -aes-256-cbc -d -in build/ci_server.key.enc -out build/server.key -base64 -K $CI_AESKEY -iv $CI_IVKEY && sfdx force:auth:jwt:grant -s --clientid $CI_CONSUMERKEY --jwtkeyfile build/server.key --username $CI_USERNAME
- loginINTEG: &loginINTEG openssl enc -nosalt -aes-256-cbc -d -in build/integ_server.key.enc -out build/server.key -base64 -K $INTEG_AESKEY -iv $INTEG_IVKEY && sfdx force:auth:jwt:grant -s --clientid $INTEG_CONSUMERKEY --jwtkeyfile build/server.key --username $INTEG_USERNAME
- loginUAT: &loginUAT openssl enc -nosalt -aes-256-cbc -d -in build/uat_server.key.enc -out build/server.key -base64 -K $UAT_AESKEY -iv $UAT_IVKEY && sfdx force:auth:jwt:grant -s --clientid $UAT_CONSUMERKEY --jwtkeyfile build/server.key --username $UAT_USERNAME
+ decryptCertificate: &decryptCertificate openssl enc -nosalt -aes-256-cbc -d -in $SERVER_KEY_PATH -out build/server.key -base64 -K $AESKEY -iv $IVKEY
+ authToOrg: &authToOrg sfdx force:auth:jwt:grant -s -i $CONSUMERKEY -f build/server.key -u $USERNAME -r $INSTANCE_URL
  assignEnvVar: &assignEnvVar export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true && export SFDX_DOMAIN_RETRY=300 && export SFDX_DISABLE_APP_HUB=true && export SFDX_LOG_LEVEL=DEBUG
  removeScratchOnlyFolders: &removeScratchOnlyFolders rm -rf force-app/main/default/namedCredentials/
  deploy: &deploy sfdx force:source:deploy -p force-app -w 15
@@ -32,10 +30,17 @@ scripts:
         script:
           #===assign variables===
           - *assignEnvVar
+          - export USERNAME=$PROD_USERNAME
+          - export CONSUMERKEY=$PROD_CONSUMERKEY
+          - export INSTANCE_URL=https://login.salesforce.com
+          - export SERVER_KEY_PATH=build/PROD_server.key.enc
+          - export AESKEY=$PROD_AESKEY
+          - export IVKEY=$PROD_IVKEY
           #===login to Dev Hub===
-          - *loginPROD
+          - *decryptCertificate
+          - *authToOrg
           #===setup scratch org===
-          - sfdx force:org:create -v $PROD_USERNAME --setdefaultusername --definitionfile config/project-scratch-def.json --setalias ciorg --wait 10 --durationdays 1
+          - sfdx force:org:create -v $USERNAME --setdefaultusername --definitionfile config/project-scratch-def.json --setalias ciorg --wait 10 --durationdays 1
           - sfdx force:org:display -u ciorg
           - sfdx force:source:push -u ciorg --json
           #===get test results===
@@ -46,50 +51,78 @@ scripts:
     - step: &ci-validate
         name: CI sandbox Check-only 
         script:
-            #===assign variables===
-            - *assignEnvVar
-            #===remove env dependant metadata===
-            - *removeScratchOnlyFolders
-            #===auth with target===
-            - *loginCI
-            #===deploy===
-            - *deployCheckOnly
+          #===assign variables===
+          - *assignEnvVar
+          - export USERNAME=$CI_USERNAME
+          - export CONSUMERKEY=$CI_CONSUMERKEY
+          - export INSTANCE_URL=https://test.salesforce.com
+          - export SERVER_KEY_PATH=build/ci_server.key.enc
+          - export AESKEY=$CI_AESKEY
+          - export IVKEY=$CI_IVKEY
+          #===remove env specific metadata===
+          - *removeScratchOnlyFolders
+          #===auth with target===
+          - *decryptCertificate
+          - *authToOrg
+          #===deploy===
+          - *deployCheckOnly
 
     - step: &integ-deploy
         name: Deploy to INTEG org
         script:
-            #===assign variables===
-            - *assignEnvVar
-            #===remove env dependant metadata===
-            - *removeScratchOnlyFolders
-            #===auth with target===
-            - *loginINTEG
-            #===deploy===
-            - *deploy
+          #===assign variables===
+          - *assignEnvVar
+          - export USERNAME=$INTEG_USERNAME
+          - export CONSUMERKEY=$INTEG_CONSUMERKEY
+          - export INSTANCE_URL=https://test.salesforce.com
+          - export SERVER_KEY_PATH=build/integ_server.key.enc
+          - export AESKEY=$INTEG_AESKEY
+          - export IVKEY=$INTEG_IVKEY
+          #===remove env specific metadata===
+          - *removeScratchOnlyFolders
+          #===auth with target===
+          - *decryptCertificate
+          - *authToOrg
+          #===deploy===
+          - *deploy
 
     - step: &uat-deploy
         name: Deploy to UAT org
         script:
-            #===assign variables===
-            - *assignEnvVar
-            #===remove env dependant metadata===
-            - *removeScratchOnlyFolders
-            #===auth with target===
-            - *loginUAT
-            #===deploy===
-            - *deployAndTest
+          #===assign variables===
+          - *assignEnvVar
+          - export USERNAME=$UAT_USERNAME
+          - export CONSUMERKEY=$UAT_CONSUMERKEY
+          - export INSTANCE_URL=https://test.salesforce.com
+          - export SERVER_KEY_PATH=build/uat_server.key.enc
+          - export AESKEY=$UAT_AESKEY
+          - export IVKEY=$UAT_IVKEY
+          #===remove env specific metadata===
+          - *removeScratchOnlyFolders
+          #===auth with target===
+          - *decryptCertificate
+          - *authToOrg
+          #===deploy===
+          - *deployAndTest
 
     - step: &prod-deploy
         name: Deploy to PROD org
         script:
-            #===assign variables===
-            - *assignEnvVar
-            #===remove env dependant metadata===
-            - *removeScratchOnlyFolders
-            #===auth with target===
-            - *loginPROD
-            #===deploy===
-            - *deploy
+          #===assign variables===
+          - *assignEnvVar
+          - export USERNAME=$PROD_USERNAME
+          - export CONSUMERKEY=$PROD_CONSUMERKEY
+          - export INSTANCE_URL=https://login.salesforce.com
+          - export SERVER_KEY_PATH=build/PROD_server.key.enc
+          - export AESKEY=$PROD_AESKEY
+          - export IVKEY=$PROD_IVKEY
+          #===remove env specific metadata===
+          - *removeScratchOnlyFolders
+          #===auth with target===
+          - *decryptCertificate
+          - *authToOrg
+          #===deploy===
+          - *deploy
 
 
 
@@ -98,9 +131,9 @@ pipelines:
 
   default: #this will run for all branches unless specificed otherwise
     - parallel:
-        - step: *pmd-check
-        - step: *scratch-check
-        - step: *ci-validate
+      - step: *pmd-check
+      - step: *scratch-check
+      - step: *ci-validate
 
   branches:
     develop:

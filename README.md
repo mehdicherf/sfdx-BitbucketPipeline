@@ -16,45 +16,45 @@ The steps bellow describe how to set up a pipeline for this developement and rel
 
 ![overview](https://github.com/mehdisfdc/sfdx-BitbucketPipeline/blob/master/img/overview.png "Overview")
 
-## Step 1 - Create connected app and certificate to authenticate with JWT-Based Flow:
+## Step 0 - Prerequisites
+
 * On your local machine, make sure you have the Salesforce CLI installed. Check by running `sfdx force --help` and confirm you see the command output. If you don't have it installed you can download and install it from https://developer.salesforce.com/tools/sfdxcli
 
-* Create a Private Key and Self-Signed Digital Certificate for *each* org to authorize: https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_key_and_cert.htm
-    * PROD (which is also the Dev Hub)
-    * INTEG
-    * CI
-    * UAT
-    
-* Authorise each org. using JWT-based flow: Create a connected app to use the JWT-Based Flow to login (https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_jwt_flow.htm) For more info on setting up JWT-based auth, see also the Salesforce DX Developer Guide (https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev)
+* If you want to test on your local machine, make sure you have the ability to execute shell script.
 
-* (Optionnal) Confirm you can perform a JWT-based auth: `sfdx force:auth:jwt:grant --clientid <your_consumer_key> --jwtkeyfile server.key --username <your_username> --setdefaultdevhubusername`
+## Step 1 - Create connected app to authenticate with JWT-Based Flow:
 
-## Step 2 - Encrypt the certificate before saving it to your repo:
-* Then we will encrypt and store the generated `server.key` in encrypted form. First, generate a key and initialization vector (iv) to encrypt your server.key file locally. The key and iv are used by Bitbucket Pipeplines to decrypt your server key in the build environment. Use a random and long passphrase generated with your password manager:
-`openssl enc -aes-256-cbc -k <passphrase here> -P -md sha256 -nosalt`
-* Make note of the `key` and `iv` values output to the screen. You'll use the values following `key=` and `iv =` to encrypt your `server.key`.
+* Create a connected app to use the JWT-Based Flow to login (https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_connected_app.htm) (except step 7 and 8, we'll do that later). For more info on setting up JWT-based auth, see also the Salesforce DX Developer Guide (https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev)
 
-* Encrypt the `server.key` using the newly generated `key` and `iv` values: Use theses key and iv values only once (once per certificate and environment). While you can re-use this pair to encrypt other things, it's considered a security violation to do so. Every time you run the command above, it generates a new key and iv value. You can't regenerate the same pair. If you lose these values, generate new ones and encrypt again.
-`mkdir build`
-    `openssl enc -nosalt -md sha256 -aes-256-cbc -in JWT/server.key -out build/PROD_server.key.enc -base64 -K <key from above> -iv <iv from above>`
-* This step replaces the existing `server.key` with your encrypted version.
-  
-* Store the `key` and `iv` values in your password manager (in the entry of this environment). You'll use these values in a subsequent step in the Bitbucket Pipeplines UI. These values are considered secret so please treat them as such.
+* From this JWT-based connected app on Salesforce, retrieve the generated `Consumer Key` from your org.
+
+* Set your Consumer Key in a Bitbucket Pipelines protected environment variable named `PROD_CONSUMERKEY` using the Bitbucket Pipelines UI (under `Settings > Repository variables`). Set your Username in a Bitbucket Pipelines environment variable named `PROD_USERNAME` using the Bitbucket Pipelines UI. 
+
+## Step 2 - Create the certificate and the encrypted private key:
+* To generate the certificate and the encrypted private key, execute the script :
+```
+$ ./bootstrap-jwt-auth-prerequisites.sh <password> <env>
+```
+
+* Set your PROD password in a protected Bitbucket Pipelines environment variable named `PROD_KEY_PASSWORD` using the Bitbucket Pipelines UI (under `Settings > Repository variables`).
+
+* Upload the certificate from `./certificates/<env>.crt`. Follow step 7 and 8 from the documentatiion (https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_connected_app.htm)
 
 * Clear the terminal history: `history -c`
 
-* From your JWT-based connected app on Salesforce, retrieve the generated `Consumer Key` from your org.
+* Set your Consumer Key in a Bitbucket Pipelines environment variable named `PROD_CONSUMERKEY` using the Bitbucket Pipelines UI (under `Settings > Repository variables`). Set your Username in a Bitbucket Pipelines environment variable named `PROD_USERNAME` using the Bitbucket Pipelines UI (use an API only user).
 
-* Set your Consumer Key in a Bitbucket Pipelines environment variable named `PROD_CONSUMERKEY` using the Bitbucket Pipelines UI (under `Settings > Repository variables`). Set your Username in a Bitbucket Pipelines environment variable named `PROD_USERNAME` using the Bitbucket Pipelines UI. 
+* Commit the updated `PROD_server.key.enc` file (you can remove the certificate) from the repo and store it into a shared document library
+```
+$ git add build/PROD_server.key.enc
+$ git commit -m 'add PROD env encrypted server key'
+$ git push
+```
 
-* Store the `key` and `iv` values used above in Bitbucket Pipelines environment variables named `PROD_AESKEY` and `PROD_IVKEY`, respectively. When finished setting environment variables, the environment variables setup screen should look like the one below.
+* (Optionnal) Confirm you can perform a JWT-based auth: `sfdx force:auth:jwt:grant --clientid <your_consumer_key> --jwtkeyfile server.key --username <your_username> --setdefaultdevhubusername`
 
-* IMPORTANT! Delete the `server.key` file. Don't store the server.key within the project. NEVER commit it!
-
-* Commit the updated `PROD_server.key.enc` file
-
-## Step 3 - Repeat in each org to connect to:
-* Repeat those step for each environment you need to connect to!
+## Step 3 - Repeat in each org to connect to from step 1:
+* Repeat from step 1 for each environment you need to connect to!
     * PROD (HUB)
     * UAT
     * INTEG

@@ -20,9 +20,9 @@ The steps bellow describe how to set up a pipeline for this developement and rel
 
 * On your local machine, make sure you have the Salesforce CLI installed. Check by running `sfdx force --help` and confirm you see the command output. If you don't have it installed you can download and install it from https://developer.salesforce.com/tools/sfdxcli
 
-* If you want to test on your local machine, make sure you have the ability to execute shell script.
+* We will use a script to generate the certificates to use with JWT-based auth, so make sure you have the ability to execute shell script.
 
-* Give the right to execute the bootstrap script
+* Give the right to execute the bootstrap-jwt-auth script
 ```
 $ chmod u+x bootstrap-jwt-auth-prerequisites.sh
 ```

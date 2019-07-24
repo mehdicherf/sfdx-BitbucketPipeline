@@ -50,7 +50,7 @@ Exemple: `./bootstrap-jwt-auth-prerequisites.sh put_here_your_strong_password PR
 
 * Set your Consumer Key in a Bitbucket Pipelines environment variable named `PROD_CONSUMERKEY` using the Bitbucket Pipelines UI (under `Settings > Repository variables`). Set your Username in a Bitbucket Pipelines environment variable named `PROD_USERNAME` using the Bitbucket Pipelines UI (use an API only user).
 
-* Commit the updated `PROD_server.key.enc` file (you can remove the certificate) from the repo and store it into a shared document library
+* Commit the `PROD_server.key.enc` file from the `build` folder and store it into a shared document library of your repo. The `certificate` folder (containing the .crt file you uploaded in Salesforce) can be deleted.
 ```
 $ git add build/PROD_server.key.enc
 $ git commit -m 'add PROD env encrypted server key'

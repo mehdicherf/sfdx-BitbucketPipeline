@@ -5,13 +5,13 @@ image: mehdisfdc/sfdx-cli #image with sfdx installed
 definitions:
  
 scripts:
- decryptCertificate: &decryptCertificate openssl enc -nosalt -aes-256-cbc -d -in $SERVER_KEY_PATH -out build/server.key -base64 -K $AESKEY -iv $IVKEY
+ decryptCertificate: &decryptCertificate openssl aes-256-cbc -d -md md5 -in $SERVER_KEY_PATH -out build/server.key -k $SERVER_KEY_PASSWORD
  authToOrg: &authToOrg sfdx force:auth:jwt:grant -s -i $CONSUMERKEY -f build/server.key -u $USERNAME -r $INSTANCE_URL
  assignEnvVar: &assignEnvVar export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true && export SFDX_DOMAIN_RETRY=300 && export SFDX_DISABLE_APP_HUB=true && export SFDX_LOG_LEVEL=DEBUG
  removeScratchOnlyFolders: &removeScratchOnlyFolders rm -rf force-app/main/default/namedCredentials/
  deploy: &deploy sfdx force:source:deploy -p force-app -w 15
- deployAndTest: &deployAndTest sfdx force:source:deploy -p force-app -l RunLocalTests -w 15
- deployCheckOnly: &deployCheckOnly sfdx force:source:deploy -c -p force-app -l RunLocalTests -w 15
+ deployAndTest: &deployAndTest sfdx force:source:deploy -p force-app -l RunLocalTests -w 30
+ deployCheckOnly: &deployCheckOnly sfdx force:source:deploy -c -p force-app -l RunLocalTests -w 30
 
  
  steps:
@@ -34,8 +34,7 @@ scripts:
           - export CONSUMERKEY=$PROD_CONSUMERKEY
           - export INSTANCE_URL=https://login.salesforce.com
           - export SERVER_KEY_PATH=build/PROD_server.key.enc
-          - export AESKEY=$PROD_AESKEY
-          - export IVKEY=$PROD_IVKEY
+          - export SERVER_KEY_PASSWORD=$PROD_KEY_PASSWORD
           #===login to Dev Hub===
           - *decryptCertificate
           - *authToOrg
@@ -56,9 +55,8 @@ scripts:
           - export USERNAME=$CI_USERNAME
           - export CONSUMERKEY=$CI_CONSUMERKEY
           - export INSTANCE_URL=https://test.salesforce.com
-          - export SERVER_KEY_PATH=build/ci_server.key.enc
-          - export AESKEY=$CI_AESKEY
-          - export IVKEY=$CI_IVKEY
+          - export SERVER_KEY_PATH=build/CI_server.key.enc
+          - export SERVER_KEY_PASSWORD=$CI_KEY_PASSWORD
           #===remove env specific metadata===
           - *removeScratchOnlyFolders
           #===auth with target===
@@ -75,9 +73,8 @@ scripts:
           - export USERNAME=$INTEG_USERNAME
           - export CONSUMERKEY=$INTEG_CONSUMERKEY
           - export INSTANCE_URL=https://test.salesforce.com
-          - export SERVER_KEY_PATH=build/integ_server.key.enc
-          - export AESKEY=$INTEG_AESKEY
-          - export IVKEY=$INTEG_IVKEY
+          - export SERVER_KEY_PATH=build/INTEG_server.key.enc
+          - export SERVER_KEY_PASSWORD=$INTEG_KEY_PASSWORD
           #===remove env specific metadata===
           - *removeScratchOnlyFolders
           #===auth with target===
@@ -94,9 +91,8 @@ scripts:
           - export USERNAME=$UAT_USERNAME
           - export CONSUMERKEY=$UAT_CONSUMERKEY
           - export INSTANCE_URL=https://test.salesforce.com
-          - export SERVER_KEY_PATH=build/uat_server.key.enc
-          - export AESKEY=$UAT_AESKEY
-          - export IVKEY=$UAT_IVKEY
+          - export SERVER_KEY_PATH=build/UAT_server.key.enc
+          - export SERVER_KEY_PASSWORD=$UAT_KEY_PASSWORD
           #===remove env specific metadata===
           - *removeScratchOnlyFolders
           #===auth with target===
@@ -114,8 +110,7 @@ scripts:
           - export CONSUMERKEY=$PROD_CONSUMERKEY
           - export INSTANCE_URL=https://login.salesforce.com
           - export SERVER_KEY_PATH=build/PROD_server.key.enc
-          - export AESKEY=$PROD_AESKEY
-          - export IVKEY=$PROD_IVKEY
+          - export SERVER_KEY_PASSWORD=$PROD_KEY_PASSWORD
           #===remove env specific metadata===
           - *removeScratchOnlyFolders
           #===auth with target===

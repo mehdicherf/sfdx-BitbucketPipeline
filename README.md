@@ -36,7 +36,7 @@ $ chmod u+x bootstrap-jwt-auth-prerequisites.sh
 * Set your Consumer Key in a Bitbucket Pipelines **protected** environment variable named `PROD_CONSUMERKEY` using the Bitbucket Pipelines UI (under `Settings > Repository variables`). Set your Username in a Bitbucket Pipelines environment variable named `PROD_USERNAME` using the Bitbucket Pipelines UI. 
 
 ## Step 2 - Create the certificate and the encrypted private key:
-* To generate the certificate and the encrypted private key, execute the script :
+* To generate the certificate and the encrypted private key, execute the script. Make sure to use a strong password (i.e. long, unique, and randomly-generated).
 ```
 $ ./bootstrap-jwt-auth-prerequisites.sh <password> <env>
 ```

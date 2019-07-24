@@ -8,9 +8,6 @@
 #
 # DESCRIPTION:  Self-signed SSL certificates (AKA "Server keys") are needed for JWT auth stuff.
 #
-# INSTRUCTIONS: Execute the following command relative to your project's root directory:  
-#               ./dev-tools/make-server-key myAwesomePassword myEnv
-#
 #
 #### FETCH INPUT ###################################################################################
 #

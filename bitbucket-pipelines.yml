@@ -55,7 +55,7 @@ scripts:
           - export USERNAME=$CI_USERNAME
           - export CONSUMERKEY=$CI_CONSUMERKEY
           - export INSTANCE_URL=https://test.salesforce.com
-          - export SERVER_KEY_PATH=build/ci_server.key.enc
+          - export SERVER_KEY_PATH=build/CI_server.key.enc
           - export SERVER_KEY_PASSWORD=$CI_KEY_PASSWORD
           #===remove env specific metadata===
           - *removeScratchOnlyFolders
@@ -73,7 +73,7 @@ scripts:
           - export USERNAME=$INTEG_USERNAME
           - export CONSUMERKEY=$INTEG_CONSUMERKEY
           - export INSTANCE_URL=https://test.salesforce.com
-          - export SERVER_KEY_PATH=build/integ_server.key.enc
+          - export SERVER_KEY_PATH=build/INTEG_server.key.enc
           - export SERVER_KEY_PASSWORD=$INTEG_KEY_PASSWORD
           #===remove env specific metadata===
           - *removeScratchOnlyFolders
@@ -91,7 +91,7 @@ scripts:
           - export USERNAME=$UAT_USERNAME
           - export CONSUMERKEY=$UAT_CONSUMERKEY
           - export INSTANCE_URL=https://test.salesforce.com
-          - export SERVER_KEY_PATH=build/uat_server.key.enc
+          - export SERVER_KEY_PATH=build/UAT_server.key.enc
           - export SERVER_KEY_PASSWORD=$UAT_KEY_PASSWORD
           #===remove env specific metadata===
           - *removeScratchOnlyFolders

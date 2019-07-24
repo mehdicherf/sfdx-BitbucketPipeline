@@ -46,7 +46,7 @@ Exemple: `./bootstrap-jwt-auth-prerequisites.sh put_here_your_strong_password PR
 
 * Upload the certificate from `./certificate/<env>.crt`. Follow step 7 and 8 from the documentation (https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_connected_app.htm)
 
-* Clear the terminal history: `history -c`
+* Clear the terminal history: `history -c && clear`
 
 * Set your Consumer Key in a Bitbucket Pipelines environment variable named `PROD_CONSUMERKEY` using the Bitbucket Pipelines UI (under `Settings > Repository variables`). Set your Username in a Bitbucket Pipelines environment variable named `PROD_USERNAME` using the Bitbucket Pipelines UI (use an API only user).
 

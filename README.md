@@ -57,7 +57,7 @@ $ git commit -m 'add PROD env encrypted server key'
 $ git push
 ```
 
-* (Optionnal) Confirm you can perform a JWT-based auth: `sfdx force:auth:jwt:grant --clientid <your_consumer_key> --jwtkeyfile <your_server_key> --username <your_username> --setdefaultdevhubusername`
+* (Optional) Confirm you can perform a JWT-based auth: `sfdx force:auth:jwt:grant --clientid <your_consumer_key> --jwtkeyfile <your_server_key> --username <your_username> --setdefaultdevhubusername`
 
 ## Step 3 - Repeat in each org to connect to from step 1:
 * Repeat from step 1 for each environment you need to connect to!

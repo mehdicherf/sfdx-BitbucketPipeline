@@ -16,7 +16,7 @@ The steps bellow describe how to set up a pipeline for this developement and rel
 
 ![overview](https://github.com/mehdisfdc/sfdx-BitbucketPipeline/blob/master/img/overview.png "Overview")
 
-## Step 0 - Prerequisites
+## Step 0 - Prerequisites:
 
 * On your local machine, make sure you have the Salesforce CLI installed. Check by running `sfdx force --help` and confirm you see the command output. If you don't have it installed you can download and install it from https://developer.salesforce.com/tools/sfdxcli
 
@@ -43,7 +43,7 @@ $ ./bootstrap-jwt-auth-prerequisites.sh <password> <env>
 
 * Set your PROD password in a **protected** Bitbucket Pipelines environment variable named `PROD_KEY_PASSWORD` using the Bitbucket Pipelines UI (under `Settings > Repository variables`).
 
-* Upload the certificate from `./certificate/<env>.crt`. Follow step 7 and 8 from the documentatiion (https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_connected_app.htm)
+* Upload the certificate from `./certificate/<env>.crt`. Follow step 7 and 8 from the documentation (https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_connected_app.htm)
 
 * Clear the terminal history: `history -c`
 

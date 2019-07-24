@@ -60,7 +60,7 @@ $ git push
 
 ## Step 3 - Repeat in each org to connect to from step 1:
 * Repeat from step 1 for each environment you need to connect to!
-    * PROD (HUB)
+    * PROD
     * UAT
     * INTEG
     * CI

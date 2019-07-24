@@ -40,6 +40,7 @@ $ chmod u+x bootstrap-jwt-auth-prerequisites.sh
 ```
 $ ./bootstrap-jwt-auth-prerequisites.sh <password> <env>
 ```
+Exemple: `./bootstrap-jwt-auth-prerequisites.sh put_here_your_strong_password PROD`
 
 * Set your PROD password in a **protected** Bitbucket Pipelines environment variable named `PROD_KEY_PASSWORD` using the Bitbucket Pipelines UI (under `Settings > Repository variables`).
 

@@ -9,7 +9,7 @@ scripts:
  authToOrg: &authToOrg sfdx force:auth:jwt:grant -s -i $CONSUMERKEY -f build/server.key -u $USERNAME -r $INSTANCE_URL
  assignEnvVar: &assignEnvVar export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true && export SFDX_DOMAIN_RETRY=300 && export SFDX_DISABLE_APP_HUB=true && export SFDX_LOG_LEVEL=DEBUG
  removeScratchOnlyFolders: &removeScratchOnlyFolders rm -rf force-app/main/default/namedCredentials/
- deploy: &deploy sfdx force:source:deploy -p force-app -w 15
+ deploy: &deploy sfdx force:source:deploy -p force-app -w 30
  deployAndTest: &deployAndTest sfdx force:source:deploy -p force-app -l RunLocalTests -w 30
  deployCheckOnly: &deployCheckOnly sfdx force:source:deploy -c -p force-app -l RunLocalTests -w 30
 

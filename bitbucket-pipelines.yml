@@ -20,10 +20,10 @@ scripts:
         name: Code Quality - PMD
         script:
           #===Download PMD===
-          - wget https://github.com/pmd/pmd/releases/download/pmd_releases%2F6.16.0/pmd-bin-6.16.0.zip
-          - unzip pmd-bin-6.16.0.zip
+          - wget https://github.com/pmd/pmd/releases/download/pmd_releases%2F$PMD_VERSION/pmd-bin-$PMD_VERSION.zip
+          - unzip pmd-bin-$PMD_VERSION.zip
           #===Make sure there is no PMD error with a high priority===
-          - pmd-bin-6.16.0/bin/run.sh pmd -minimumpriority $PMD_MINIMUM_PRIORITY -d force-app -R custom-apex-rules.xml -f text -l apex
+          - pmd-bin-$PMD_VERSION/bin/run.sh pmd -minimumpriority $PMD_MINIMUM_PRIORITY -d force-app -R custom-apex-rules.xml -f text -l apex
 
     - step: &scratch-check
         name: Scratch org Push & Test

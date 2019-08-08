@@ -67,9 +67,11 @@ $ git push
     * CI
     
 ## Step 4 - Configure Apex PMD:
-* Add to your repo a custom-apex-rules.xml ruleset file for Apex PMD, such as https://github.com/mehdisfdc/sfdx-PMDruleset/blob/master/custom-apex-rules.xml
+* Add to your repo a custom-apex-rules.xml ruleset file for Apex PMD. Here is a sample ruleset you could use: https://github.com/mehdisfdc/sfdx-PMDruleset/blob/master/custom-apex-rules.xml
 
-*  Create a Bitbucket Pipelines environment variable named `PMD_MINIMUM_PRIORITY` to trigger a build failure when a high priority issue is found (recommended error threshold: 2)
+* Create a Bitbucket Pipelines environment variable named `PMD_VERSION` to specify the PMD version to use (such as `6.17.0` for instance). PMD releases are listed here: https://github.com/pmd/pmd/releases
+
+* Create a Bitbucket Pipelines environment variable named `PMD_MINIMUM_PRIORITY` to trigger a build failure when a high priority issue is found (recommended error threshold: 2)
     
 ## Step 5 - Create and commit the yml file:
 * Create or re-use a docker image with Salesforce CLI installed, such as:  https://hub.docker.com/r/mehdisfdc/sfdx-cli/dockerfile

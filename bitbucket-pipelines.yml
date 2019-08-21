@@ -5,7 +5,7 @@ image: mehdisfdc/sfdx-cli #image with sfdx installed
 definitions:
  
 scripts:
- decryptCertificate: &decryptCertificate openssl aes-256-cbc -d -md md5 -in $SERVER_KEY_PATH -out build/server.key -k $SERVER_KEY_PASSWORD
+ decryptCertificate: &decryptCertificate openssl aes-256-cbc -d -md md5 -in $SERVER_KEY_PATH -out build/server.key -pass pass:$SERVER_KEY_PASSWORD
  authToOrg: &authToOrg sfdx force:auth:jwt:grant -s -i $CONSUMERKEY -f build/server.key -u $USERNAME -r $INSTANCE_URL
  assignEnvVar: &assignEnvVar export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true && export SFDX_DOMAIN_RETRY=300 && export SFDX_DISABLE_APP_HUB=true && export SFDX_LOG_LEVEL=DEBUG
  removeScratchOnlyFolders: &removeScratchOnlyFolders rm -rf force-app/main/default/namedCredentials/

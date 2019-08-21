@@ -50,7 +50,7 @@ openssl x509 -req -sha256 -days $CERTIFICATE_EXPIRE_DAYS -in server.csr -signkey
 mkdir ../build 2>/dev/null
 mkdir ../certificate 2>/dev/null
 
-openssl aes-256-cbc -salt -e -in server.key -out "${ENV}_server.key.enc" -k $PASSWORD 2>/dev/null
+openssl aes-256-cbc -salt -e -in server.key -out "${ENV}_server.key.enc" -pass pass:$PASSWORD 2>/dev/null
 mv "${ENV}_server.key.enc" ../build
 mv "$ENV.crt" ../certificate
 cd ..

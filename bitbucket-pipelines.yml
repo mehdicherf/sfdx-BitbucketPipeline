@@ -117,7 +117,7 @@ scripts:
           - *decryptCertificate
           - *authToOrg
           #===deploy===
-          - *deploy
+          - *deployAndTest
 
 
 

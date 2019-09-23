@@ -67,7 +67,7 @@ $ git push
 ## Step 4 - Configure Apex PMD:
 * Add to your repo a custom-apex-rules.xml ruleset file for Apex PMD. Here is a sample ruleset you could use: https://github.com/mehdisfdc/sfdx-PMDruleset/blob/master/custom-apex-rules.xml
 
-* Create a Bitbucket Pipelines environment variable named `PMD_VERSION` to specify the PMD version to use (such as `6.17.0` for instance). PMD releases are listed here: https://github.com/pmd/pmd/releases
+* Create a Bitbucket Pipelines environment variable named `PMD_VERSION` to specify the PMD version to use (such as `6.18.0`). PMD releases are listed here: https://github.com/pmd/pmd/releases
 
 * Create a Bitbucket Pipelines environment variable named `PMD_MINIMUM_PRIORITY` to trigger a build failure when a high priority issue is found (recommended error threshold: 2)
     

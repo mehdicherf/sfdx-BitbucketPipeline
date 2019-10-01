@@ -1,4 +1,4 @@
-image: mehdisfdc/sfdx-cli #image with sfdx installed
+image: mehdisfdc/sfdx-cli-beta #image with sfdx and sgd installed
 
 
 #===DEFINITIONS===
@@ -9,9 +9,11 @@ scripts:
  authToOrg: &authToOrg sfdx force:auth:jwt:grant -s -i $CONSUMERKEY -f build/server.key -u $USERNAME -r $INSTANCE_URL
  assignEnvVar: &assignEnvVar export SFDX_USE_GENERIC_UNIX_KEYCHAIN=true && export SFDX_DOMAIN_RETRY=300 && export SFDX_DISABLE_APP_HUB=true && export SFDX_LOG_LEVEL=DEBUG
  removeScratchOnlyFolders: &removeScratchOnlyFolders rm -rf force-app/main/default/namedCredentials/
+ gitDeltaSources: &gitDeltaSources if [ $DELTA_DEPLOY = 'TRUE' ]; then mkdir output && sgd -t HEAD -f $LAST_DEPLOYED_COMMIT -r . -o output && rm -rf force-app && mv output/force-app/ .; fi
  deploy: &deploy sfdx force:source:deploy -p force-app -w 30
  deployAndTest: &deployAndTest sfdx force:source:deploy -p force-app -l RunLocalTests -w 30
  deployCheckOnly: &deployCheckOnly sfdx force:source:deploy -c -p force-app -l RunLocalTests -w 30
+ deployDestructiveDelta: &deployDestructiveDelta if [ $DELTA_DEPLOY = 'TRUE' ]; then cat output/destructiveChanges.xml && sfdx force:mdapi:deploy -d output -w 15 --ignorewarnings; fi
 
  
  steps:
@@ -43,6 +45,7 @@ scripts:
           - sfdx force:org:display -u ciorg
           - sfdx force:source:push -u ciorg --json
           #===get test results===
+          - sleep 60
           - sfdx force:apex:test:run -u ciorg --wait 10
           #===delete scratch org===
           - sfdx force:org:delete -u ciorg -p
@@ -57,13 +60,40 @@ scripts:
           - export INSTANCE_URL=https://test.salesforce.com
           - export SERVER_KEY_PATH=build/CI_server.key.enc
           - export SERVER_KEY_PASSWORD=$CI_KEY_PASSWORD
+          - export SFDX_AUDIENCE_URL=https://test.salesforce.com
           #===remove env specific metadata===
           - *removeScratchOnlyFolders
           #===auth with target===
           - *decryptCertificate
           - *authToOrg
+          #===prepare delta sources===
+          - git fetch origin "+refs/heads/*:refs/remotes/origin/*"
+          - export LAST_DEPLOYED_COMMIT=origin/master
+          - *gitDeltaSources
           #===deploy===
           - *deployCheckOnly
+
+    - step: &ci-deploy
+        name: Deploy to CI org
+        script:
+          #===assign variables===
+          - *assignEnvVar
+          - export USERNAME=$CI_USERNAME
+          - export CONSUMERKEY=$CI_CONSUMERKEY
+          - export INSTANCE_URL=https://test.salesforce.com
+          - export SERVER_KEY_PATH=build/CI_server.key.enc
+          - export SERVER_KEY_PASSWORD=$CI_KEY_PASSWORD
+          #===remove env specific metadata===
+          - *removeScratchOnlyFolders
+          #===auth with target===
+          - *decryptCertificate
+          - *authToOrg
+          #===prepare delta sources===
+          - export LAST_DEPLOYED_COMMIT=HEAD^
+          - *gitDeltaSources
+          #===deploy===
+          - *deploy
+          - *deployDestructiveDelta
 
     - step: &integ-deploy
         name: Deploy to INTEG org
@@ -80,8 +110,12 @@ scripts:
           #===auth with target===
           - *decryptCertificate
           - *authToOrg
+          #===prepare delta sources===
+          - export LAST_DEPLOYED_COMMIT=HEAD^
+          - *gitDeltaSources
           #===deploy===
           - *deploy
+          - *deployDestructiveDelta
 
     - step: &uat-deploy
         name: Deploy to UAT org
@@ -98,8 +132,34 @@ scripts:
           #===auth with target===
           - *decryptCertificate
           - *authToOrg
+          #===prepare delta sources===
+          - export LAST_DEPLOYED_COMMIT=HEAD^
+          - *gitDeltaSources
           #===deploy===
           - *deployAndTest
+          - *deployDestructiveDelta
+
+    - step: &preprod-deploy
+        name: Deploy to PREPROD org
+        script:
+          #===assign variables===
+          - *assignEnvVar
+          - export USERNAME=$PREPROD_USERNAME
+          - export CONSUMERKEY=$PREPROD_CONSUMERKEY
+          - export INSTANCE_URL=https://test.salesforce.com
+          - export SERVER_KEY_PATH=build/PREPROD_server.key.enc
+          - export SERVER_KEY_PASSWORD=$PREPROD_KEY_PASSWORD
+          #===remove env specific metadata===
+          - *removeScratchOnlyFolders
+          #===auth with target===
+          - *decryptCertificate
+          - *authToOrg
+          #===prepare delta sources===
+          - export LAST_DEPLOYED_COMMIT=HEAD^
+          - *gitDeltaSources
+          #===deploy===
+          - *deployAndTest
+          - *deployDestructiveDelta
 
     - step: &prod-deploy
         name: Deploy to PROD org
@@ -116,8 +176,13 @@ scripts:
           #===auth with target===
           - *decryptCertificate
           - *authToOrg
+          #===prepare delta sources===
+          - export LAST_DEPLOYED_COMMIT=HEAD^
+          - *gitDeltaSources
           #===deploy===
           - *deployAndTest
+          - *deployDestructiveDelta
+
 
 
 
@@ -134,6 +199,9 @@ pipelines:
     develop:
       - step: *integ-deploy
     release/*:
-      - step: *uat-deploy
+      - parallel:
+        - step: *uat-deploy
+        - step: *preprod-deploy
     master:
       - step: *prod-deploy
+      - step: *ci-deploy

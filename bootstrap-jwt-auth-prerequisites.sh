@@ -55,5 +55,5 @@ mv "${ENV}_server.key.enc" ../build
 mv "$ENV.crt" ../certificate
 cd ..
 rm -rf tmp
-echo "$ENV.crt in the build folder"
-echo "${ENV}_server.key.enc created in the certificate folder"
+echo "$ENV.crt created in the certificate folder"
+echo "${ENV}_server.key.enc created in the build folder"

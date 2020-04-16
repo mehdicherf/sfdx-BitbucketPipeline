@@ -139,28 +139,6 @@ scripts:
           - *deployAndTest
           - *deployDestructiveDelta
 
-    - step: &preprod-deploy
-        name: Deploy to PREPROD org
-        script:
-          #===assign variables===
-          - *assignEnvVar
-          - export USERNAME=$PREPROD_USERNAME
-          - export CONSUMERKEY=$PREPROD_CONSUMERKEY
-          - export INSTANCE_URL=https://test.salesforce.com
-          - export SERVER_KEY_PATH=build/PREPROD_server.key.enc
-          - export SERVER_KEY_PASSWORD=$PREPROD_KEY_PASSWORD
-          #===remove env specific metadata===
-          - *removeScratchOnlyFolders
-          #===auth with target===
-          - *decryptCertificate
-          - *authToOrg
-          #===prepare delta sources===
-          - export LAST_DEPLOYED_COMMIT=HEAD^
-          - *gitDeltaSources
-          #===deploy===
-          - *deployAndTest
-          - *deployDestructiveDelta
-
     - step: &prod-deploy
         name: Deploy to PROD org
         script:
